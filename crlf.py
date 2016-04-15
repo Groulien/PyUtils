@@ -13,28 +13,28 @@ dic = {
     'mac'   : cr,
     'lf'    : lf,
     'unix'  : lf,
-    'linux' : lf
-
-    }
+    'linux' : lf }
 if (len(sys.argv) < 3):
     tab = ' '*4
     
     print("Syntax:")
-    print(tab+"crlf.py file target [-o] [output]")
+    print(tab+"crlf.py file -ending [-o overwrite] [output]")
     print("")
-    print("target:")
-    print("-CR or -mac             convert LF and CRLF to Macintosh compatible CR")
-    print("-LF or -unix or -linux  convert CR and CRLF to Linux and Unix compatible CR")
-    print("-CRLF or -win           convert LF and CR to Windows compatible CRLF")
-
+    print("ending:")
+    print(tab+"-CR or -mac             convert LF and CRLF to Macintosh compatible CR")
+    print(tab+"-LF or -unix or -linux  convert CR and CRLF to Linux and Unix compatible CR")
+    print(tab+"-CRLF or -win           convert LF and CR to Windows compatible CRLF")
+    print("")
+    print("output: output file. Will overwrite original if ommitted.")
+    print("-o, overwrite output file.")
+    
 else:
-
     inFile = None
     outFile = None
     target = None
     overwrite = False
     for arg in sys.argv[1:]: # skip first argument, which is the path of this script.
-        if arg[0] == '-' or arg[0] == '/':
+        if arg[0] in ['-', '/']:
             arg = arg[1:].lower()
             if arg == 'o':
                 overwrite = True
@@ -71,11 +71,8 @@ else:
         print("Output file exists. Please add overwrite flag ( -o ).")
         exit(-6)
         
-
-    
+    # actual function
     buffer = io.BytesIO()
-
-    
     handle = open(inFile, 'rb+')
     prev = None
     current = handle.read(1)
@@ -101,4 +98,3 @@ else:
     
     handle.write(buffer.getvalue())
     handle.close()
-
