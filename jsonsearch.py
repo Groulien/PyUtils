@@ -3,6 +3,7 @@ import sys
 import json
 import fnmatch
 import argparse
+import platform
 
 class JsonSearch:
     path = None
@@ -58,10 +59,14 @@ if __name__ == "__main__":
     parser.add_argument('-v', '--value', help='Search for value', default=None)
     parser.add_argument('-l', '--limit',  help='Limit the number of results', type=int, default=None)
     parser.add_argument('--type', help='Forces datatype for the value', choices=['int', 'float', 'string', 'auto'], default='auto')
-    parser.add_argument('--print', help="print certain data, both by default", choices=['path', 'value', 'both'], default='both')
-    parser.add_argument('--color', help="adds color to printed values", action='store_true', default=False)
+    parser.add_argument('--output', help="output certain data, both by default", choices=['path', 'value', 'both'], default='both')
+    parser.add_argument('--color', help="[LINUX ONLY] adds color to printed values", action='store_true', default=False)
 
     args = parser.parse_args()
+
+    if args.color and platform.system() == 'Windows':
+        print('COLORS ARE NOT SUPPORTED ON WINDOWS')
+        args.color = False
 
     if(args.path == None and args.value == None):
         print('Must search path and/or value.')
@@ -94,7 +99,7 @@ if __name__ == "__main__":
                 return self.style_number + value
             return self.style_text + value
         
-        def print(self, value, stack, path):
+        def output(self, value, stack, path):
             self._output(self.formatter(self, value, stack, path))
         
         def _output(self, text):
@@ -118,6 +123,7 @@ if __name__ == "__main__":
             'string' : str,
             'auto' : detect
         }
+        args.value = unicode(args.value, 'utf-8') # Windows compatibility
         if args.value.isnumeric():
             search.value = types[args.type](args.value)
         else:
@@ -130,10 +136,10 @@ if __name__ == "__main__":
 
     x = printer()
     if(args.color == False):
-        x.style_text = x.style_number = x.style_pathLeft = x.style_pathRight = x.style_reset
+        x.style_text = x.style_number = x.style_pathLeft = x.style_pathRight = x.style_reset = ''
 
-    x.formatter = handlers[args.print]
-    search.handler = x.print
+    x.formatter = handlers[args.output]
+    search.handler = x.output
     with open(args.file) as file:
         data = file.read()
         file.close()
