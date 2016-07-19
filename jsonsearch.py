@@ -95,7 +95,7 @@ if __name__ == "__main__":
         
         def styleValue(self, value):
             value = str(value)
-            if(value.isnumeric()):
+            if(unicode(value,'utf-8').isnumeric()):
                 return self.style_number + value
             return self.style_text + value
         
