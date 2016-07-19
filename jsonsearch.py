@@ -13,33 +13,38 @@ class JsonSearch:
 
     def search(self, json):
         self._count = 0
-        self._walk(json, [json], [])
+        self._walk(json, [], [])
         return
 
     def _walk(self, node, stack, path):
-        for n in node:
-            if(self._count == self.limit):
-                return
-            value = node[n]
-            stack.append(value)
-            if isinstance(value, dict):
+        stack.append(node)
+        if isinstance(node, dict):
+            for n in node:
+                value = node[n]
                 path.append(n)
+                i = len(path)
+                self._walk(value, stack, path)
+                if i != len(path):
+                    print('err')
+                    exit(-1)
+                path.pop()
+
+        elif isinstance(node, list):
+            prefix = path.pop() if len(path) > 0 else ''
+            for i in range(0, len(node)):
+                value = node[i]
+                path.append(prefix+'['+str(i)+']')
                 self._walk(value, stack, path)
                 path.pop()
-            elif isinstance(value, list):
-                for i in range(0,len(value)):
-                    if(self._count == self.limit):
-                        return
-                    path.append(n+'['+str(i)+']')
-                    self._walk(value[i], stack, path)
-                    path.pop()
-            else:
-                path.append(n)
-                if(self._validate(value, path)):
-                    self.handler(value, stack, path)
-                    self._count += 1
-                path.pop()
-            stack.pop()
+            if len(prefix) > 0: 
+               path.append(prefix)
+
+        else:
+            if self._validate(node, path):
+               self.handler(node, stack, path)
+               self._count += 1
+        stack.pop()
+
 
     def _validate(self, value, path):
         fullpath = '/'.join(path)
@@ -77,6 +82,8 @@ if __name__ == "__main__":
         formatter       = None
 
         def stylePath(self, path):
+            if len(path) == 1:
+                return self.style_pathRight + path[0]
             left = self.style_seperator.join(path[:-1])
             right = path[-1:][0]
             return self.style_pathLeft + left + self.style_pathRight + self.style_seperator + right
