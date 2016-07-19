@@ -2,99 +2,73 @@
 import os
 import sys
 import io
-crlf = b'\r\n'
-lf = b'\n'
-cr =  b'\r'
+import argparse
 
-dic = {
-    'crlf'  : crlf,
-    'win'   : crlf,
-    'cr'    : cr,
-    'mac'   : cr,
-    'lf'    : lf,
-    'unix'  : lf,
-    'linux' : lf }
-if (len(sys.argv) < 3):
-    tab = ' '*4
-    
-    print("Syntax:")
-    print(tab+"crlf.py file -ending [-o overwrite] [output]")
-    print("")
-    print("ending:")
-    print(tab+"-CR or -mac             convert LF and CRLF to Macintosh compatible CR")
-    print(tab+"-LF or -unix or -linux  convert CR and CRLF to Linux and Unix compatible CR")
-    print(tab+"-CRLF or -win           convert LF and CR to Windows compatible CRLF")
-    print("")
-    print("output: output file. Will overwrite original if ommitted.")
-    print("-o, overwrite output file.")
-    
-else:
-    inFile = None
-    outFile = None
-    target = None
+class LineEndings:
     overwrite = False
-    for arg in sys.argv[1:]: # skip first argument, which is the path of this script.
-        if arg[0] in ['-', '/']:
-            arg = arg[1:].lower()
-            if arg == 'o':
-                overwrite = True
-            elif arg in dic:
-                if target is None:
-                    target = dic[arg]
-                else:
-                    print("Cannot set target line endings twice.")
-                    exit(-1)
-        else:
-            if inFile is None:
-                inFile = arg
-            elif outFile is None:
-                outFile = arg
-            else:
-                print("");
-                exit(-2)
-    #validation
-    if target is None:
-        print("No line ending specified")
-        exit(-3)
-        
-    if inFile is None:
-        print("No valid target platform provided")
-        exit(-4)
-    if False == os.path.exists(inFile):
-        print("Input file does not exist")
-        exit(-5)
-
-    if outFile is None:
-        outFile = inFile
-        overwrite = True
-    elif os.path.exists(outFile) and not overwrite:
-        print("Output file exists. Please add overwrite flag ( -o ).")
-        exit(-6)
-        
-    # actual function
-    buffer = io.BytesIO()
-    handle = open(inFile, 'rb+')
-    prev = None
-    current = handle.read(1)
-    while(current != b""):
-        if(current == b'\r'):
-            buffer.write(target)
-        elif (current == b'\n'):
-            if(prev != b'\r'): #skip if it's \r\n, because we've already replaced it
-                buffer.write(target)
-        else:
-            buffer.write(current)
-        prev = current
-        current = handle.read(1)
-        
-    #end of while
-    if(inFile == outFile):
-        handle.seek(0)
-        handle.truncate()
-    else:
-        handle.close()
-        handle = open(outFile, 'rb+');
-        handle.truncate()
+    symbol = None
     
-    handle.write(buffer.getvalue())
-    handle.close()
+    def process(self, inFile, outFile):
+        buffer = io.BytesIO()
+        handle = open(inFile, 'rb+')
+        prev = None
+        current = handle.read(1)
+        while(current != b""):
+            if(current == b'\r'):
+                buffer.write(self.symbol)
+            elif (current == b'\n'):
+                if(prev != b'\r'): #skip if it's \r\n, because we've already replaced it
+                    buffer.write(self.symbol)
+            else:
+                buffer.write(current)
+            prev = current
+            current = handle.read(1)
+            
+        #end of while
+        if(inFile == outFile):
+            handle.seek(0)
+            handle.truncate()
+        else:
+            handle.close()
+            handle = open(outFile, 'w+');
+            handle.truncate()
+        
+        handle.write(buffer.getvalue())
+        handle.close()
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Converts the line endings of a file. Author: By Niek Hoekstra',)
+    parser.add_argument('ending', help='New line endings', choices=['cr', 'lf', 'crlf', 'win','linux', 'mac'])
+    parser.add_argument('input', help='File to adjust line endings of.')
+    parser.add_argument('-o', '--output', help='Output file', default=None)
+    parser.add_argument('--overwrite', help='Overwrite the current file or the output file.', action='store_true', default=False)
+
+    args = parser.parse_args()
+
+    editor = LineEndings()
+    if not os.path.exists(args.input):
+        print('Input file does not exist')
+        exit(-1)
+
+    if args.output is None:
+        args.output = args.input
+
+    if os.path.exists(args.output):
+        if not args.overwrite:
+            print('Output already exists, please use the overwrite flag to continue')
+            exit(-1)
+            
+    _dic = {
+        'win'   : b'\r\n',
+        'crlf'  : b'\r\n',
+        
+        'linux' : b'\n',
+        'unix'  : b'\n',
+        'lf'    : b'\n',
+
+        'mac'   : b'\r',
+        'cr'    : b'\r'
+        }
+    editor.symbol = _dic[args.ending]
+    editor.overwrite = args.overwrite
+    editor.process(args.input, args.output)
