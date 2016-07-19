@@ -42,7 +42,7 @@ Example output:
 Search a json file for certain path and/or value.
 ```sh
 $ jsonsearch.py jsonfile [-p, --path=searchpattern] [-v, --value=searchvalue] 
-[-l, --limit=displaylimit] [--type=datatype] [--output=format]
+[-l, --limit=displaylimit] [--type=datatype] [--print=format]
 ```
 Argument |  Description | Parameters
 --- | --- |---
@@ -52,8 +52,8 @@ file | JSON file |
 -l, --limit | Limit the number of results |
 \-\-type | Datatype of the supplied value | { int, float, string, **auto** }
 \-\-output | Output only certain information | { path, value, **both** }
-\-\-color | Colors the path and values of output |
-
+\-\-color | Colors the path and values of output *(Linux-only)*  |
+*Support would cost [about 70 lines](https://www.burgaud.com/bring-colors-to-the-windows-console-with-python), which would make it one-third of the file.* ***I refuse.***
 
 Example JSON:
 ```json
@@ -86,8 +86,8 @@ target/value : 500
 $ jsonsearch.py test.json -v=500
 ```
 ```
-target/value : 500
 scores[1] : 500
+target/value : 500
 ```
 
 ### Example 3: print
