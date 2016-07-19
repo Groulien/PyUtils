@@ -65,7 +65,7 @@ Example JSON:
    "target": {
       "value": 500,
       "unit": "minutes"
-   }
+   },
    "scores": [
        600,
        500,
@@ -75,7 +75,7 @@ Example JSON:
 ```
 ### Example 1: path
 ```sh
-$ jsonsearch.py test.py -p=*/value
+$ jsonsearch.py test.json -p=*/value
 ```
 ```sh
 duration/value : 300
@@ -83,7 +83,7 @@ target/value : 500
 ```
 ### Example 2: value
 ```sh
-$ jsonsearch.py test.py -v=500
+$ jsonsearch.py test.json -v=500
 ```
 ```
 target/value : 500
@@ -92,7 +92,7 @@ scores[1] : 500
 
 ### Example 3: print
 ```sh
-$ jsonsearch.py test.py -v=500 --print=path
+$ jsonsearch.py test.json -v=500 --print=path
 ```
 ```
 target/value
