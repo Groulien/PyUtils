@@ -51,7 +51,7 @@ file | JSON file |
 -v, --value | Value to search for | Textual or numeric value
 -l, --limit | Limit the number of results |
 \-\-type | Datatype of the supplied value | { int, float, string, **auto** }
-\-\-print | Print only certain information | { path, value, **both** }
+\-\-output | Output only certain information | { path, value, **both** }
 \-\-color | Colors the path and values of output |
 
 
@@ -92,9 +92,9 @@ scores[1] : 500
 
 ### Example 3: print
 ```sh
-$ jsonsearch.py test.json -v=500 --print=path
+$ jsonsearch.py test.json -v=500 --output=path
 ```
 ```
-target/value
 scores[1]
+target/value
 ```
