@@ -42,7 +42,7 @@ Example output:
 Search a json file for certain path and/or value.
 ```sh
 $ jsonsearch.py jsonfile [-p, --path=searchpattern] [-v, --value=searchvalue] 
-[-l, --limit=displaylimit] [--type=datatype] [--print=format]
+[-l, --limit=displaylimit] [--type=datatype] [--output=format]
 ```
 Argument |  Description | Parameters
 --- | --- |---
