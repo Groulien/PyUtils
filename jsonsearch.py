@@ -92,16 +92,16 @@ if __name__ == "__main__":
             left = self.style_seperator.join(path[:-1])
             right = path[-1:][0]
             return self.style_pathLeft + left + self.style_pathRight + self.style_seperator + right
-        
+
         def styleValue(self, value):
             value = str(value)
-            if(unicode(value,'utf-8').isnumeric()):
+            if(str(value).isnumeric()):
                 return self.style_number + value
             return self.style_text + value
-        
+
         def output(self, value, stack, path):
             self._output(self.formatter(self, value, stack, path))
-        
+
         def _output(self, text):
             print(text + self.style_reset)
 
@@ -123,7 +123,7 @@ if __name__ == "__main__":
             'string' : str,
             'auto' : detect
         }
-        args.value = unicode(args.value, 'utf-8') # Windows compatibility
+        args.value = str(args.value) # Windows compatibility
         if args.value.isnumeric():
             search.value = types[args.type](args.value)
         else:
@@ -132,7 +132,7 @@ if __name__ == "__main__":
         'path' : lambda pr, v,s,p : pr.stylePath(p),
         'value' : lambda pr, v,s,p : pr.styleValue(v),
         'both': lambda pr, v,s,p :  "{} : {} ".format(pr.stylePath(p), pr.styleValue(v))
-    }    
+    }
 
     x = printer()
     if(args.color == False):
